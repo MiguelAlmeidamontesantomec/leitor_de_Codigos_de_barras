@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+        }
+        .count {
+            font-size: 24px;
+            color: #0044AA;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #0044AA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003388;
+        }
+        img {
+            border: 2px solid #0044AA;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contagem de Códigos de Barras</h1>
+        <div class="count">Total: <span id="barcode_count">0</span></div>
+        <div class="buttons">
+            <button onclick="savePdf()">Salvar Contagem em PDF</button>
+            <button onclick="listPdfs()">Ver PDFs Salvos</button>
+            <button onclick="stopApp()">Encerrar Aplicação</button>
+        </div>
+        <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+    </div>
+
+    <script>
+        // Função para buscar a contagem atual do servidor e atualizar a interface
+        function updateCount() {
+            fetch('/get_count')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('barcode_count').textContent = data.count;
+                })
+                .catch(error => console.error('Erro ao atualizar a contagem:', error));
+        }
+
+        // Atualiza a contagem a cada 2 segundos
+        setInterval(updateCount, 2000);
+
+        // Atualiza a contagem imediatamente ao carregar a página
+        updateCount();
+
+        // Função para salvar a contagem em PDF
+        function savePdf() {
+            fetch('/save_pdf')
+                .then(() => {
+                    alert("PDF salvo com sucesso!");
+                })
+                .catch(error => console.error('Erro ao salvar o PDF:', error));
+        }
+
+        // Função para listar os PDFs salvos
+        function listPdfs() {
+            window.location.href = '/list_pdfs';
+        }
+
+        // Função para encerrar a aplicação
+        function stopApp() {
+            fetch('/stop')
+                .then(() => {
+                    alert("Aplicação encerrada!");
+                })
+                .catch(error => console.error('Erro ao encerrar a aplicação:', error));
+        }
+    </script>
+</body>
+</html>
